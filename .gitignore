@@ -1,4 +1,5 @@
 *.code-workspace
+config.ini
 driver
 pgweb
 __pycache__/*
