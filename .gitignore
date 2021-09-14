@@ -2,4 +2,4 @@
 config.ini
 driver
 pgweb
-__pycache__/*
+__pycache__/
