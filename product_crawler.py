@@ -10,7 +10,7 @@ def crawl ():
     getUrl = lambda page:'https://www.continente.pt/mercearia/arroz-massa-e-farinha/arroz/?start='+str(page);
     #TODO calculate latency at the time [its a joke]
     driver.implicitly_wait(10)
-    urls = []
+    elements = []
     page_increment=0;
     while True:
         driver.get(getUrl(page_increment))
@@ -46,19 +46,17 @@ def crawl ():
             data = {
                 "url": nameElement.get_attribute('href'),
                 "name": nameElement.text,
-                "price": priceElement.text[1:],
+                "price": priceElement.text[1:].replace(",","."),
                 #For this website "Desconto Imediato: " precedes the actual discount and it comes in percentage not the decimal value for analitical purposes
                 "discount": 0 if len(discountElements)==0 else float(discountElements[0].text[19:-1])/100,
                 #TODO multithreading theres no way the crawler gonna do a switch/if statement for each element when most of the time its gonna be measure in the right measurment
                 "measure": measures[measureKey][1],
                 "quantity": rawQuantity/measures[measureKey][0]
             }
-            
-            #print(data)
-            #urls.append(url)
+            elements.append(data)
             print('collected: '+ str(data))
     driver.close()
-    #api.db_ins_entry(api.db_init(), urls)    
+    api.db_ins_entry(api.db_init(), elements)    
     
 
 crawl()

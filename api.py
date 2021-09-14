@@ -1,6 +1,5 @@
 import psycopg2
 from config import dbconfig
-
 def db_init():
     conn = None
     try:
@@ -16,14 +15,24 @@ def db_init():
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+def collectors_format(collector, id):
+    return "('"+str(id[0])+"','"+collector["name"]+"','"+str(collector["price"])+"','"+str(collector["discount"])+"')"
 
-
-def db_ins_entry(conn, urlList):
+def db_ins_entry(conn, elements):
     try:
         cur = conn.cursor()
-        values = ", ".join(list(map(lambda url: "('"+url+"')",urlList)))
-        cur.execute('Insert into products (url) Values '+values+' on conflict do nothing;')
+        links = ", ".join(list(map(lambda info: "('"+info["url"]+"')",elements)))
+        cur.execute('Insert into products (url) Values'+links+' on conflict do nothing RETURNING id;')
+        #A list that stores the response given by sql after filling the first table, this returns the id's of url's incremented and designated by product_id_seq
+        Aydis = cur.fetchall()
+        print(Aydis)
+        extracted = ", ".join(list(map(collectors_format, elements, Aydis)))
+        print(extracted)
+        #TODO change ***everything*** from portuguese to english unless its not open to the public 
+        cur.execute('insert into collectors(id_product,nome,price,per_desconto) values '+  extracted)
+        #cur.execute('Insert into products (product_id, name, price, discount) Values('+extracted+')')
         conn.commit()
+        
         print("Inserted values in products")
         cur.close()
         
