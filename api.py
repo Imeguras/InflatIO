@@ -16,7 +16,7 @@ def db_init():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 def collectors_format(collector, id):
-    return "('"+str(id[0])+"','"+collector["name"]+"','"+str(collector["price"])+"','"+str(collector["discount"])+"')"
+    return "', '".join("('"+str(id[0])+collector["name"]+str(collector["price"])+str(collector["discount"])+")"
 
 def db_ins_entry(conn, elements):
     try:
@@ -40,3 +40,8 @@ def db_ins_entry(conn, elements):
         print("Error: "+str(error))
     
 
+def db_terminate(conn):
+    try:
+        conn.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
