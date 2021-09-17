@@ -16,7 +16,7 @@ def db_init():
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 def collectors_format(collector, id):
-    return "', '".join("('"+str(id[0])+collector["name"]+str(collector["price"])+str(collector["discount"])+")"
+    return "('"+str(id[0])+"','"+collector["name"]+"','"+str(collector["price"])+"','"+str(collector["discount"])+"')"
 
 def db_ins_entry(conn, elements):
     try:
