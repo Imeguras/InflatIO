@@ -58,6 +58,5 @@ def crawl ():
     driver.close()
     api.db_ins_entry(api.db_init(), elements)    
     
-
 crawl()
 
