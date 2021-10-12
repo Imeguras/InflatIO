@@ -14,7 +14,7 @@ class Measure(Base):
     measure = Column(Enum('kg', 'l', 'un', name='measure_type'), nullable=False)
     quantity = Column(Float(53), nullable=False)
     def __repr__ (self):
-        return str("{ id=%s; measure=%s; quantity=%s; }\n", self.id, self.measure, self.quantity)
+        return "{ id=%s; measure=%s; quantity=%s; }\n" % (self.id, self.measure, self.quantity)
 
 
 class Product(Base):
@@ -25,7 +25,7 @@ class Product(Base):
     date_created = Column(DateTime(True), server_default=text("now()"))
     enabled = Column(Boolean, server_default=text("true"))
     def __repr__ (self):
-        return str("{ id=%s; url=%s; date_created=%s; enabled=%s }\n",self.id, self.url, self.date_created, self.enabled)
+        return "{ id=%s; url=%s; date_created=%s; enabled=%s }\n" % (self.id, self.url, self.date_created, self.enabled)
 
 
 t_standard = Table(
@@ -65,4 +65,4 @@ class Collector(Base):
     product = relationship('Product')
     measure1 = relationship('Measure')
     def __repr__ (self):
-        return str("{ id=%s; id_product=%s; price=%s; nome=%s; date_collected=%s; per_desconto=%s; marca=%s; categoria=%s; measure=%s }\n",self.id, self.id_product, self.price, self.nome, self.date_collected, self.per_desconto, self.marca, self.categoria, self.measure)
+        return "{ id=%s; id_product=%s; price=%s; nome=%s; date_collected=%s; per_desconto=%s; marca=%s; categoria=%s; measure=%s }\n" % (self.id, self.id_product, self.price, self.nome, self.date_collected, self.per_desconto, self.marca, self.categoria, self.measure)
