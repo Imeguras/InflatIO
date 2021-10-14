@@ -1,4 +1,3 @@
-# coding: utf-8
 from sqlalchemy import Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, Table, Text, text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,7 +9,8 @@ metadata = Base.metadata
 class Measure(Base):
     __tablename__ = 'measures'
 
-    id = Column(Integer, primary_key=True, server_default=text("nextval('measures_id_seq'::regclass)"))
+    id = Column(Integer, primary_key=True,
+                server_default=text("nextval('measures_id_seq'::regclass)"))
     measure = Column(Enum('kg', 'l', 'un', name='measure_type'), nullable=False)
     quantity = Column(Float(53), nullable=False)
 
@@ -18,7 +18,8 @@ class Measure(Base):
 class Product(Base):
     __tablename__ = 'products'
 
-    id = Column(Integer, primary_key=True, server_default=text("nextval('product_id_seq'::regclass)"))
+    id = Column(Integer, primary_key=True,
+                server_default=text("nextval('product_id_seq'::regclass)"))
     url = Column(Text, nullable=False, unique=True)
     date_created = Column(DateTime(True), server_default=text("now()"))
     enabled = Column(Boolean, server_default=text("true"))
