@@ -1,17 +1,34 @@
 from selenium import webdriver 
 from config import dbconfig
 import api
+import json
 
+driver = webdriver.Chrome(executable_path="./driver")
 
-def crawl ():
-    driver = webdriver.Chrome(executable_path="./driver")
-
+def continente_urls():
+    driver.get("https://continente.pt");
     
-    getUrl = lambda page:'https://www.continente.pt/mercearia/arroz-massa-e-farinha/arroz/?start='+str(page);
-    #TODO calculate latency at the time [its a joke]
+    # ignores "Ver Todos" & broader category links
+    linkNodes = driver.find_elements_by_css_selector("a:not(.dropdown-toggle):not(.ct-font--opensans-italic).dropdown-link")
+    urls = []
+    for linkNode in linkNodes:
+        link = linkNode.get_attribute('href')
+        # if nothing after 4th slash,
+        # then it's a category link and not a product listing
+        if(link.split("/")[4] != ""):
+            urls+=[link]
+    return urls
+
+
+def crawl (driverUrl):
+    # continente specific method
+    getUrl = lambda page:driverUrl+'?start='+str(page);
+
     driver.implicitly_wait(10)
     elements = []
     page_increment=0;
+
+    # has break below
     while True:
         driver.get(getUrl(page_increment))
 
@@ -55,8 +72,16 @@ def crawl ():
             }
             elements.append(data)
             print('collected: '+ str(data))
-    driver.close()
-    api.db_ins_entry(api.db_init(), elements)    
-    
-crawl()
 
+    api.db_ins_entry(api.db_init(), elements)
+
+
+def main():
+    urls = continente_urls()
+    print("urls fetched")
+    for url in urls:
+        crawl(url)
+
+
+main()
+driver.close()
