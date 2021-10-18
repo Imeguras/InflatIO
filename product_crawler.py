@@ -22,7 +22,9 @@ def continente_urls():
 def crawl (driverUrl):
     # continente specific method
     getUrl = lambda page:driverUrl+'?start='+str(page);
-
+    #extracts the category from the url, this could be done up there but it would require an array or memory to be passed on
+    cat_section_url = driverUrl.rsplit("/", 2)[1]
+    
     driver.implicitly_wait(10)
     elements = []
     page_increment=0;
@@ -47,6 +49,8 @@ def crawl (driverUrl):
             #Elements because its a sneaky way to prevent a failed search, since it may not exist
             discountElements = tile.find_elements_by_css_selector('.ct-discount-amount')
             quantityElement = tile.find_element_by_css_selector('.ct-tile--quantity')
+            brandElement= tile.find_element_by_css_selector('.ct-tile--brand')
+            categoryElement = cat_section_url
             #Url has been "historically" fetched as a hyperlink from clicking the title
             measureKey = quantityElement.text[-2:]
 
@@ -72,7 +76,9 @@ def crawl (driverUrl):
                 "discount": 0 if len(discountElements)==0 else float(discountElements[0].text[19:-1])/100,
                 #TODO multithreading theres no way the crawler gonna do a switch/if statement for each element when most of the time its gonna be measure in the right measurment
                 "measure": measures[measureKey][1],
-                "quantity": rawQuantity/measures[measureKey][0]
+                "quantity": rawQuantity/measures[measureKey][0],
+                "brand": brandElement.text,
+                "category": categoryElement
             }
             elements.append(data)
             print('collected: '+ str(data))

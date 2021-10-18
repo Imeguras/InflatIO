@@ -12,7 +12,7 @@ class Product(Base):
     url = Column(String, nullable=False)
     date_created = Column(DateTime(True), nullable=False, server_default=text("now()"))
     product_name = Column(String, nullable=False)
-    brand = Column(String, nullable=True)
+    brand = Column(String, nullable=False)
     category = Column(String, nullable=True)
     price = Column(Float(53), nullable=False)
     per_discount = Column(Float(53))
