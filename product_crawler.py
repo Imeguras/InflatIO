@@ -1,13 +1,12 @@
-from selenium import webdriver 
-from config import dbconfig
+from selenium import webdriver
 import api
-import json
 
 driver = webdriver.Chrome(executable_path="./driver")
 
+
 def continente_urls():
     driver.get("https://continente.pt");
-    
+
     # ignores "Ver Todos" & broader category links
     linkNodes = driver.find_elements_by_css_selector("a:not(.dropdown-toggle):not(.ct-font--opensans-italic).dropdown-link")
     urls = []
@@ -16,7 +15,7 @@ def continente_urls():
         # if nothing after 4th slash,
         # then it's a category link and not a product listing
         if(link.split("/")[4] != ""):
-            urls+=[link]
+            urls += [link]
     return urls
 
 
@@ -50,9 +49,14 @@ def crawl (driverUrl):
             quantityElement = tile.find_element_by_css_selector('.ct-tile--quantity')
             #Url has been "historically" fetched as a hyperlink from clicking the title
             measureKey = quantityElement.text[-2:]
-            rawQuantity = float(quantityElement.text.split()[1].replace(',','.'))
+
+            # In the website the value can be "emb. 50 gr" OR "emb.50 gr"
+            # see https://www.continente.pt/produto/batata-frita-lisa-yorkeso-ruffles-7390758.html for a bad input
+            # can also be "emb. x gr (peso escorrido x )" 
+            rawQuantity = float(quantityElement.text.split(".")[1].split(" ")[1].replace(',','.'))
             measures={
                 "lt":(1,'l'),
+                " L":(1,'l'),
                 "dl":(10,'l'),
                 "cl":(100,'l'),
                 "ml":(1000,'l'),
