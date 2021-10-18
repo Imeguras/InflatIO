@@ -1,5 +1,5 @@
 import sqlalchemy as db
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 from config import dbconfig
 import models as models
 
@@ -20,32 +20,16 @@ def db_init():
 
 def db_ins_entry(session, elements):
     try:
-        products = [models.Product(url=el.url) for el in elements]
-        # merge with db, creates or gets with ids
-        products = map(session.merge, products)
+        for el in elements:
+            session.add(models.Product(
+                url=el["url"],
+                product_name=el["name"],
+                price=el["price"],
+                per_discount=el["discount"],
+                measure_unit=el["measure"],
+                measure_value=el["quantity"]))
 
-        measures = [models.Measure(measure=el.measure, quantity=el.quantity)
-                    for el in elements]
-        map(session.add, measures)
-
-        collectors = []
-        for index, measure in enumerate(measures):
-            product = products[index]
-            element = elements[index]
-            collectors.append(
-                models.Collector(
-                    product = product,
-                    measure1 = measure,
-                    name = element["name"]
-                    price = element["price"]
-                    #this is still in portuguese ffs
-                    per_desconto = element["discount"]
-                )
-
-        map(session.add, collectors)
         session.commit()
         print("Inserted values in products")
-    except (Exception, psycopg2.DatabaseError) as error:
+    except BaseException as error:
         print("Error: "+str(error))
-
-db_init()
