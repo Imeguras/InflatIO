@@ -1,9 +1,10 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import api
 from datetime import datetime
 from sys import stderr
 
-driver = webdriver.Chrome(executable_path="./driver")
+driver = webdriver.Chrome()
 
 def getTimestamp():
   return datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
@@ -18,7 +19,7 @@ def continente_urls():
     driver.get("https://continente.pt");
 
     # ignores "Ver Todos" & broader category links
-    linkNodes = driver.find_elements_by_css_selector("a:not(.dropdown-toggle):not(.ct-font--opensans-italic).dropdown-link")
+    linkNodes = driver.find_elements(By.CSS_SELECTOR, "a:not(.dropdown-toggle):not(.ct-font--opensans-italic).dropdown-link")
     urls = []
     for linkNode in linkNodes:
         link = linkNode.get_attribute('href')
@@ -30,6 +31,7 @@ def continente_urls():
 
 
 def crawl (driverUrl):
+    db = api.db_init()
     # continente specific method
     getUrl = lambda page:driverUrl+'?start='+str(page);
     #extracts the category from the url, this could be done up there but it would require an array or memory to be passed on
@@ -43,7 +45,7 @@ def crawl (driverUrl):
     while True:
         driver.get(getUrl(page_increment))
 
-        tiles = driver.find_elements_by_css_selector('.ct-tile-body')
+        tiles = driver.find_elements(By.CSS_SELECTOR,'.ct-tile-body')
         driver.implicitly_wait(0)
         # found nothing, end of pages
         if(len(tiles) == 0):
@@ -53,12 +55,12 @@ def crawl (driverUrl):
         
         for tile in tiles:
             try :
-                nameElement = tile.find_element_by_css_selector('.ct-tile--description')
-                priceElement = tile.find_element_by_css_selector('.ct-price-formatted')
+                nameElement = tile.find_elements(By.CSS_SELECTOR,'.ct-tile--description')
+                priceElement = tile.find_elements(By.CSS_SELECTOR,'.ct-price-formatted')
                 #Elements because its a sneaky way to prevent a failed search, since it may not exist
-                discountElements = tile.find_elements_by_css_selector('.ct-discount-amount')
-                quantityElement = tile.find_element_by_css_selector('.ct-tile--quantity')
-                brandElement= tile.find_element_by_css_selector('.ct-tile--brand')
+                discountElements = tile.find_elements(By.CSS_SELECTOR,'.ct-discount-amount')
+                quantityElement = tile.find_elements(By.CSS_SELECTOR,'.ct-tile--quantity')
+                brandElement= tile.find_elements(By.CSS_SELECTOR,'.ct-tile--brand')
                 categoryElement = cat_section_url
                 #Url has been "historically" fetched as a hyperlink from clicking the title
                 measureKey = quantityElement.text[-2:]
@@ -93,9 +95,7 @@ def crawl (driverUrl):
                 print('collected: '+ str(data))
             except Exception as e:
                 logError("tile error, WIP state")
-
-    api.db_ins_entry(api.db_init(), elements)
-
+    api.db_ins_entry(db, elements)
 
 def main():
     urls = continente_urls()
